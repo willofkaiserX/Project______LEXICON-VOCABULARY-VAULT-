@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lexicon Vault - Vocabulary Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <span class="brand-icon">📚</span>
+                <span class="brand-text">Lexicon Vault</span>
+                <div class="xp-display">
+                    <span class="xp-level" id="xpLevel">Level 1</span>
+                    <span class="xp-points" id="xpPoints">0 XP</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#search" class="nav-link">Search</a></li>
+                <li><a href="#vocabulary" class="nav-link">Vocabulary</a></li>
+                <li><a href="#flashcards" class="nav-link">Flashcards</a></li>
+                <li><a href="#quiz" class="nav-link">Quiz</a></li>
+                <li><a href="#statistics" class="nav-link">Statistics</a></li>
+                <li class="language-selector">
+                    <select id="languageSelect" class="language-select">
+                        <option value="en">🇬🇧 English</option>
+                        <option value="hi">🇮🇳 Hindi</option>
+                        <option value="fr">🇫🇷 French</option>
+                        <option value="es">🇪🇸 Spanish</option>
+                        <option value="de">🇩🇪 German</option>
+                        <option value="ja">🇯🇵 Japanese</option>
+                    </select>
+                </li>
+            </ul>
+            <button class="nav-toggle" aria-label="Toggle navigation">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <div class="container">
+                <div class="hero">
+                    <h1 class="hero-title">Welcome to Lexicon Vault</h1>
+                    <p class="hero-subtitle">Build your personal vocabulary collection with ease</p>
+                    <div class="hero-stats">
+                        <div class="stat-card">
+                            <span class="stat-value" id="totalWordsHome">0</span>
+                            <span class="stat-label">Words Saved</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value" id="learnedWordsHome">0</span>
+                            <span class="stat-label">Words Learned</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Daily Challenge -->
+                <div class="daily-challenge">
+                    <h2 class="section-title">Daily Challenge</h2>
+                    <div class="challenge-card" id="dailyChallengeCard">
+                        <div class="challenge-icon">🎯</div>
+                        <div class="challenge-content">
+                            <h3 class="challenge-title" id="challengeTitle">Save 5 new words</h3>
+                            <p class="challenge-progress" id="challengeProgress">0 / 5 completed</p>
+                            <div class="challenge-reward">+30 XP</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Word of the Day -->
+                <div class="word-of-day">
+                    <h2 class="section-title">Word of the Day</h2>
+                    <div class="word-card" id="wordOfDayCard">
+                        <div class="word-placeholder">Add words to see your word of the day</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Search Section -->
+        <section id="search" class="section">
+            <div class="container">
+                <h2 class="section-title">Search Words</h2>
+                <div class="search-container">
+                    <input type="text" id="searchInput" class="search-input" placeholder="Enter a word... (Hindi: type Roman, e.g. insaan)">
+                    <button id="micBtn" class="btn mic-btn" title="Voice search">🎤</button>
+                    <button id="searchBtn" class="btn btn-primary">Search</button>
+                </div>
+
+                <!-- Romanization / Script Hint -->
+                <div id="romanizationHint" class="romanization-hint hidden">
+                    <span class="hint-label">🔤 Detected script:</span>
+                    <span id="hintScript" class="hint-script"></span>
+                </div>
+
+                <!-- Search History -->
+                <div class="search-history" id="searchHistory">
+                    <h3 class="subsection-title">Recent Searches</h3>
+                    <div id="searchHistoryList" class="search-history-list"></div>
+                </div>
+                
+                <div id="searchResults" class="search-results"></div>
+            </div>
+        </section>
+
+        <!-- Vocabulary Section -->
+        <section id="vocabulary" class="section">
+            <div class="container">
+                <h2 class="section-title">My Vocabulary</h2>
+                <div class="vocabulary-controls">
+                    <input type="text" id="vocabSearch" class="search-input" placeholder="Search vocabulary...">
+                    <select id="sortSelect" class="sort-select">
+                        <option value="az">Sort A-Z</option>
+                        <option value="za">Sort Z-A</option>
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                    </select>
+                </div>
+                <div id="vocabularyList" class="vocabulary-list"></div>
+                <div id="emptyVocabulary" class="empty-state">
+                    <div class="empty-icon">📝</div>
+                    <p>No words saved yet. Start searching and adding words!</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Flashcards Section -->
+        <section id="flashcards" class="section">
+            <div class="container">
+                <h2 class="section-title">Flashcards</h2>
+                <div id="flashcardContainer" class="flashcard-container">
+                    <div id="flashcard" class="flashcard">
+                        <div class="flashcard-front">
+                            <div class="flashcard-word" id="flashcardWord">Add words to start</div>
+                        </div>
+                        <div class="flashcard-back">
+                            <div class="flashcard-meaning" id="flashcardMeaning"></div>
+                            <div class="flashcard-example" id="flashcardExample"></div>
+                        </div>
+                    </div>
+                    <div class="flashcard-controls">
+                        <button id="prevCard" class="btn btn-secondary">Previous</button>
+                        <button id="flipCard" class="btn btn-primary">Flip</button>
+                        <button id="nextCard" class="btn btn-secondary">Next</button>
+                        <button id="randomCard" class="btn btn-accent">Random</button>
+                    </div>
+                    <div class="flashcard-rating hidden" id="flashcardRating">
+                        <p class="rating-label">How well did you know this?</p>
+                        <div class="rating-buttons">
+                            <button class="btn btn-secondary rating-btn" data-rating="forgot">Forgot</button>
+                            <button class="btn btn-secondary rating-btn" data-rating="hard">Hard</button>
+                            <button class="btn btn-secondary rating-btn" data-rating="medium">Medium</button>
+                            <button class="btn btn-primary rating-btn" data-rating="easy">Easy</button>
+                        </div>
+                    </div>
+                    <div class="flashcard-progress">
+                        <span id="cardProgress">0 / 0</span>
+                    </div>
+                </div>
+                <div id="emptyFlashcards" class="empty-state">
+                    <div class="empty-icon">🎴</div>
+                    <p>Add words to use flashcards</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Section -->
+        <section id="quiz" class="section">
+            <div class="container">
+                <h2 class="section-title">Quiz Mode</h2>
+                <div id="quizLocked" class="quiz-locked">
+                    <div class="lock-icon">🔒</div>
+                    <p>Add at least 20 words to unlock quizzes</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="quizProgressFill"></div>
+                    </div>
+                    <p class="progress-text"><span id="quizProgress">0</span> / 20 words</p>
+                </div>
+                <div id="quizContainer" class="quiz-container hidden">
+                    <div class="quiz-menu">
+                        <button id="multipleChoiceQuiz" class="btn btn-primary btn-large">Multiple Choice</button>
+                        <button id="reverseQuiz" class="btn btn-primary btn-large">Reverse Quiz</button>
+                        <button id="learnedQuiz" class="btn btn-accent btn-large">Learned Words Challenge</button>
+                    </div>
+                    <div id="quizArea" class="quiz-area hidden">
+                        <div class="quiz-header">
+                            <button id="stopQuiz" class="btn btn-secondary btn-small">Exit Quiz</button>
+                        </div>
+                        <div class="quiz-question" id="quizQuestion"></div>
+                        <div class="quiz-options" id="quizOptions"></div>
+                        <div class="quiz-progress">
+                            <span id="quizQuestionProgress">Question 1 of 10</span>
+                        </div>
+                        <div class="quiz-feedback" id="quizFeedback"></div>
+                    </div>
+                    <div id="quizResults" class="quiz-results hidden">
+                        <h3>Quiz Complete!</h3>
+                        <div class="result-item">
+                            <span class="result-label">Correct:</span>
+                            <span class="result-value" id="resultCorrect">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Wrong:</span>
+                            <span class="result-value" id="resultWrong">0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Accuracy:</span>
+                            <span class="result-value" id="resultAccuracy">0%</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Best Score:</span>
+                            <span class="result-value" id="resultBest">0%</span>
+                        </div>
+                        <button id="restartQuiz" class="btn btn-primary">Try Again</button>
+                        <button id="backToMenu" class="btn btn-secondary">Back to Menu</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Section -->
+        <section id="statistics" class="section">
+            <div class="container">
+                <h2 class="section-title">Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card-large">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <span class="stat-value-large" id="statTotalWords">0</span>
+                            <span class="stat-label">Total Words Saved</span>
+                        </div>
+                    </div>
+                    <div class="stat-card-large">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-info">
+                            <span class="stat-value-large" id="statLearned">0</span>
+                            <span class="stat-label">Words Learned</span>
+                        </div>
+                    </div>
+                    <div class="stat-card-large">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-info">
+                            <span class="stat-value-large" id="statPending">0</span>
+                            <span class="stat-label">Words Pending</span>
+                        </div>
+                    </div>
+                    <div class="stat-card-large">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-info">
+                            <span class="stat-value-large" id="statAccuracy">0%</span>
+                            <span class="stat-label">Quiz Accuracy</span>
+                        </div>
+                    </div>
+                    <div class="stat-card-large">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-info">
+                            <span class="stat-value-large" id="statStreak">0</span>
+                            <span class="stat-label">Current Streak</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Review Mode -->
+                <div class="review-section">
+                    <h3 class="subsection-title">Review Mode</h3>
+                    <div class="review-tabs">
+                        <button class="review-tab active" data-tab="recent">Recently Added</button>
+                        <button class="review-tab" data-tab="difficult">Difficult Words</button>
+                        <button class="review-tab" data-tab="forgotten">Forgotten Words</button>
+                        <button class="review-tab" data-tab="learned">Most Learned</button>
+                        <button class="review-tab" data-tab="random">Random Review</button>
+                        <button class="review-tab" data-tab="favorites">Favorites</button>
+                    </div>
+                    <div id="reviewContent" class="review-content"></div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="achievements-section">
+                    <h3 class="subsection-title">Achievements</h3>
+                    <div class="achievements-grid" id="achievementsGrid"></div>
+                </div>
+
+                <!-- Settings -->
+                <div class="settings-section">
+                    <h3 class="subsection-title">Settings</h3>
+                    <div class="settings-item">
+                        <label class="settings-label">Sound Effects</label>
+                        <button id="soundToggle" class="btn btn-secondary btn-small">Sound: ON</button>
+                    </div>
+                </div>
+
+                <!-- Export/Import -->
+                <div class="export-section">
+                    <h3 class="subsection-title">Export & Import</h3>
+                    <div class="export-buttons">
+                        <button id="exportBtn" class="btn btn-primary">Export Vocabulary (JSON)</button>
+                        <button id="importBtn" class="btn btn-secondary">Import Vocabulary</button>
+                        <input type="file" id="importFile" accept=".json" class="hidden">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Notification -->
+    <div id="notification" class="notification hidden">
+        <span id="notificationText"></span>
+        <button id="closeNotification" class="notification-close">×</button>
+    </div>
+
+    <!-- Quiz Exit Modal -->
+    <div id="quizExitModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Exit Quiz?</h3>
+            <p>Your progress will be lost if you don't save.</p>
+            <div class="modal-actions">
+                <button id="continueQuiz" class="btn btn-primary">Continue Quiz</button>
+                <button id="saveExitQuiz" class="btn btn-secondary">Save & Exit</button>
+                <button id="discardQuiz" class="btn btn-accent">Discard Quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
