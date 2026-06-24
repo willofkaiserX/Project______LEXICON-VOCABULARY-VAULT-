@@ -68,7 +68,14 @@ const Storage = {
                 formal: wordData.example,
                 casual: wordData.example,
                 academic: wordData.example
-            }
+            },
+            // Backward compatibility: preserve new fields but provide defaults
+            allDefinitions: wordData.allDefinitions || [],
+            wordInsights: wordData.wordInsights || {},
+            wordRelationships: wordData.wordRelationships || { synonyms: [], antonyms: [], wordFamily: [] },
+            isJapanese: wordData.isJapanese || false,
+            kana: wordData.kana || '',
+            jlptLevel: wordData.jlptLevel || ''
         };
 
         vocabulary.push(newWord);
@@ -337,7 +344,183 @@ const JishoAPI = {
     ],
     JISHO: 'https://jisho.org/api/v1/search/words?keyword=',
 
+    // Common Japanese words fallback dictionary (for when APIs fail)
+    COMMON_WORDS: {
+        'neko': { kanji: '猫', kana: 'ねこ', meaning: 'cat', jlpt: 'N5', common: true },
+        'inu': { kanji: '犬', kana: 'いぬ', meaning: 'dog', jlpt: 'N5', common: true },
+        'watashi': { kanji: '私', kana: 'わたし', meaning: 'I, me', jlpt: 'N5', common: true },
+        'anata': { kanji: 'あなた', kana: 'あなた', meaning: 'you', jlpt: 'N5', common: true },
+        'arigatou': { kanji: 'ありがとう', kana: 'ありがとう', meaning: 'thank you', jlpt: 'N5', common: true },
+        'sayounara': { kanji: 'さようなら', kana: 'さようなら', meaning: 'goodbye', jlpt: 'N5', common: true },
+        'hai': { kanji: 'はい', kana: 'はい', meaning: 'yes', jlpt: 'N5', common: true },
+        'iie': { kanji: 'いいえ', kana: 'いいえ', meaning: 'no', jlpt: 'N5', common: true },
+        'sensei': { kanji: '先生', kana: 'せんせい', meaning: 'teacher', jlpt: 'N5', common: true },
+        'gakusei': { kanji: '学生', kana: 'がくせい', meaning: 'student', jlpt: 'N5', common: true },
+        'tomodachi': { kanji: '友達', kana: 'ともだち', meaning: 'friend', jlpt: 'N5', common: true },
+        'kazoku': { kanji: '家族', kana: 'かぞく', meaning: 'family', jlpt: 'N5', common: true },
+        'nihon': { kanji: '日本', kana: 'にほん', meaning: 'Japan', jlpt: 'N5', common: true },
+        'tokyo': { kanji: '東京', kana: 'とうきょう', meaning: 'Tokyo', jlpt: 'N5', common: true },
+        'sushi': { kanji: '寿司', kana: 'すし', meaning: 'sushi', jlpt: 'N5', common: true },
+        'ramen': { kanji: 'ラーメン', kana: 'らーめん', meaning: 'ramen noodles', jlpt: 'N5', common: true },
+        'sakura': { kanji: '桜', kana: 'さくら', meaning: 'cherry blossom', jlpt: 'N5', common: true },
+        'yama': { kanji: '山', kana: 'やま', meaning: 'mountain', jlpt: 'N5', common: true },
+        'kawa': { kanji: '川', kana: 'かわ', meaning: 'river', jlpt: 'N5', common: true },
+        'umi': { kanji: '海', kana: 'うみ', meaning: 'sea, ocean', jlpt: 'N5', common: true },
+        'tenki': { kanji: '天気', kana: 'てんき', meaning: 'weather', jlpt: 'N5', common: true },
+        'ame': { kanji: '雨', kana: 'あめ', meaning: 'rain', jlpt: 'N5', common: true },
+        'yuki': { kanji: '雪', kana: 'ゆき', meaning: 'snow', jlpt: 'N5', common: true },
+        'kaze': { kanji: '風', kana: 'かぜ', meaning: 'wind', jlpt: 'N5', common: true },
+        'hi': { kanji: '日', kana: 'ひ', meaning: 'day, sun', jlpt: 'N5', common: true },
+        'tsuki': { kanji: '月', kana: 'つき', meaning: 'moon', jlpt: 'N5', common: true },
+        'hoshi': { kanji: '星', kana: 'ほし', meaning: 'star', jlpt: 'N5', common: true },
+        'mizu': { kanji: '水', kana: 'みず', meaning: 'water', jlpt: 'N5', common: true },
+        'akai': { kanji: '赤い', kana: 'あかい', meaning: 'red', jlpt: 'N5', common: true },
+        'aoi': { kanji: '青い', kana: 'あおい', meaning: 'blue', jlpt: 'N5', common: true },
+        'shiroi': { kanji: '白い', kana: 'しろい', meaning: 'white', jlpt: 'N5', common: true },
+        'kuroi': { kanji: '黒い', kana: 'くろい', meaning: 'black', jlpt: 'N5', common: true },
+        'oishii': { kanji: '美味しい', kana: 'おいしい', meaning: 'delicious', jlpt: 'N5', common: true },
+        'atsui': { kanji: '暑い', kana: 'あつい', meaning: 'hot (weather)', jlpt: 'N5', common: true },
+        'samui': { kanji: '寒い', kana: 'さむい', meaning: 'cold (weather)', jlpt: 'N5', common: true },
+        'atsui': { kanji: '熱い', kana: 'あつい', meaning: 'hot (temperature)', jlpt: 'N5', common: true },
+        'tsumetai': { kanji: '冷たい', kana: 'つめたい', meaning: 'cold (temperature)', jlpt: 'N5', common: true },
+        'ookii': { kanji: '大きい', kana: 'おおきい', meaning: 'big', jlpt: 'N5', common: true },
+        'chiisai': { kanji: '小さい', kana: 'ちいさい', meaning: 'small', jlpt: 'N5', common: true },
+        'atarashii': { kanji: '新しい', kana: 'あたらしい', meaning: 'new', jlpt: 'N5', common: true },
+        'furui': { kanji: '古い', kana: 'ふるい', meaning: 'old', jlpt: 'N5', common: true },
+        'ii': { kanji: '良い', kana: 'いい', meaning: 'good', jlpt: 'N5', common: true },
+        'warui': { kanji: '悪い', kana: 'わるい', meaning: 'bad', jlpt: 'N5', common: true },
+        'tanoshii': { kanji: '楽しい', kana: 'たのしい', meaning: 'fun, enjoyable', jlpt: 'N5', common: true },
+        'muzukashii': { kanji: '難しい', kana: 'むずかしい', meaning: 'difficult', jlpt: 'N4', common: true },
+        'kantan': { kanji: '簡単', kana: 'かんたん', meaning: 'simple, easy', jlpt: 'N4', common: true },
+        'benkyou': { kanji: '勉強', kana: 'べんきょう', meaning: 'study', jlpt: 'N5', common: true },
+        'shigoto': { kanji: '仕事', kana: 'しごと', meaning: 'work, job', jlpt: 'N5', common: true },
+        'asa': { kanji: '朝', kana: 'あさ', meaning: 'morning', jlpt: 'N5', common: true },
+        'yoru': { kanji: '夜', kana: 'よる', meaning: 'night', jlpt: 'N5', common: true },
+        'gohan': { kanji: 'ご飯', kana: 'ごはん', meaning: 'meal, rice', jlpt: 'N5', common: true },
+        'tabemono': { kanji: '食べ物', kana: 'たべもの', meaning: 'food', jlpt: 'N5', common: true },
+        'nomimono': { kanji: '飲み物', kana: 'のみもの', meaning: 'drink', jlpt: 'N5', common: true },
+        'ie': { kanji: '家', kana: 'いえ', meaning: 'house, home', jlpt: 'N5', common: true },
+        'heya': { kanji: '部屋', kana: 'へや', meaning: 'room', jlpt: 'N5', common: true },
+        'kuruma': { kanji: '車', kana: 'くるま', meaning: 'car', jlpt: 'N5', common: true },
+        'densha': { kanji: '電車', kana: 'でんしゃ', meaning: 'train', jlpt: 'N5', common: true },
+        'basu': { kanji: 'バス', kana: 'ばす', meaning: 'bus', jlpt: 'N5', common: true },
+        'eki': { kanji: '駅', kana: 'えき', meaning: 'station', jlpt: 'N5', common: true },
+        'michi': { kanji: '道', kana: 'みち', meaning: 'road, path', jlpt: 'N5', common: true },
+        'machi': { kanji: '町', kana: 'まち', meaning: 'town, city', jlpt: 'N5', common: true },
+        'hon': { kanji: '本', kana: 'ほん', meaning: 'book', jlpt: 'N5', common: true },
+        'pen': { kanji: 'ペン', kana: 'ぺん', meaning: 'pen', jlpt: 'N5', common: true },
+        'kami': { kanji: '紙', kana: 'かみ', meaning: 'paper', jlpt: 'N5', common: true },
+        'enpitsu': { kanji: '鉛筆', kana: 'えんぴつ', meaning: 'pencil', jlpt: 'N5', common: true },
+        'saifu': { kanji: '財布', kana: 'さいふ', meaning: 'wallet', jlpt: 'N5', common: true },
+        'kagi': { kanji: '鍵', kana: 'かぎ', meaning: 'key', jlpt: 'N5', common: true },
+        'megane': { kanji: '眼鏡', kana: 'めがね', meaning: 'glasses', jlpt: 'N5', common: true },
+        'tokei': { kanji: '時計', kana: 'とけい', meaning: 'clock, watch', jlpt: 'N5', common: true },
+        'denwa': { kanji: '電話', kana: 'でんわ', meaning: 'telephone', jlpt: 'N5', common: true },
+        'keitai': { kanji: '携帯', kana: 'けいたい', meaning: 'mobile phone', jlpt: 'N5', common: true },
+        'pasokon': { kanji: 'パソコン', kana: 'ぱそこん', meaning: 'computer', jlpt: 'N5', common: true },
+        'intanetto': { kanji: 'インターネット', kana: 'いんたーねっと', meaning: 'internet', jlpt: 'N5', common: true },
+        'eiga': { kanji: '映画', kana: 'えいが', meaning: 'movie', jlpt: 'N5', common: true },
+        'ongaku': { kanji: '音楽', kana: 'おんがく', meaning: 'music', jlpt: 'N5', common: true },
+        'supootsu': { kanji: 'スポーツ', kana: 'すぽーつ', meaning: 'sports', jlpt: 'N5', common: true },
+        'geemu': { kanji: 'ゲーム', kana: 'げーむ', meaning: 'game', jlpt: 'N5', common: true },
+        'ryokou': { kanji: '旅行', kana: 'りょこう', meaning: 'travel', jlpt: 'N5', common: true },
+        'kaimono': { kanji: '買い物', kana: 'かいもの', meaning: 'shopping', jlpt: 'N5', common: true },
+        'yasumi': { kanji: '休み', kana: 'やすみ', meaning: 'rest, holiday', jlpt: 'N5', common: true },
+        'neru': { kanji: '寝る', kana: 'ねる', meaning: 'to sleep', jlpt: 'N5', common: true },
+        'okiru': { kanji: '起きる', kana: 'おきる', meaning: 'to wake up', jlpt: 'N5', common: true },
+        'taberu': { kanji: '食べる', kana: 'たべる', meaning: 'to eat', jlpt: 'N5', common: true },
+        'nomu': { kanji: '飲む', kana: 'のむ', meaning: 'to drink', jlpt: 'N5', common: true },
+        'miru': { kanji: '見る', kana: 'みる', meaning: 'to see, to watch', jlpt: 'N5', common: true },
+        'kiku': { kanji: '聞く', kana: 'きく', meaning: 'to hear, to listen', jlpt: 'N5', common: true },
+        'yomu': { kanji: '読む', kana: 'よむ', meaning: 'to read', jlpt: 'N5', common: true },
+        'kaku': { kanji: '書く', kana: 'かく', meaning: 'to write', jlpt: 'N5', common: true },
+        'hanasu': { kanji: '話す', kana: 'はなす', meaning: 'to speak, to talk', jlpt: 'N5', common: true },
+        'iku': { kanji: '行く', kana: 'いく', meaning: 'to go', jlpt: 'N5', common: true },
+        'kuru': { kanji: '来る', kana: 'くる', meaning: 'to come', jlpt: 'N5', common: true },
+        'kaeru': { kanji: '帰る', kana: 'かえる', meaning: 'to return', jlpt: 'N5', common: true },
+        'suru': { kanji: 'する', kana: 'する', meaning: 'to do', jlpt: 'N5', common: true },
+        'aru': { kanji: 'ある', kana: 'ある', meaning: 'to exist (inanimate)', jlpt: 'N5', common: true },
+        'iru': { kanji: 'いる', kana: 'いる', meaning: 'to exist (animate)', jlpt: 'N5', common: true },
+        'desu': { kanji: 'です', kana: 'です', meaning: 'is, am, are (polite)', jlpt: 'N5', common: true },
+        'masu': { kanji: 'ます', kana: 'ます', meaning: 'polite verb ending', jlpt: 'N5', common: true },
+        'deshita': { kanji: 'でした', kana: 'でした', meaning: 'was, were (polite past)', jlpt: 'N5', common: true },
+        'mashita': { kanji: 'ました', kana: 'ました', meaning: 'polite verb past ending', jlpt: 'N5', common: true },
+        'kudasai': { kanji: 'ください', kana: 'ください', meaning: 'please', jlpt: 'N5', common: true },
+        'sumimasen': { kanji: 'すみません', kana: 'すみません', meaning: 'excuse me, sorry', jlpt: 'N5', common: true },
+        'gomen': { kanji: 'ごめん', kana: 'ごめん', meaning: 'sorry (casual)', jlpt: 'N5', common: true },
+        'douitashimashite': { kanji: 'どういたしまして', kana: 'どういたしまして', meaning: 'you are welcome', jlpt: 'N5', common: true },
+        'ohayou': { kanji: 'おはよう', kana: 'おはよう', meaning: 'good morning', jlpt: 'N5', common: true },
+        'konnichiwa': { kanji: 'こんにちは', kana: 'こんにちは', meaning: 'hello, good afternoon', jlpt: 'N5', common: true },
+        'konbanwa': { kanji: 'こんばんは', kana: 'こんばんは', meaning: 'good evening', jlpt: 'N5', common: true },
+        'oyasumi': { kanji: 'おやすみ', kana: 'おやすみ', meaning: 'good night', jlpt: 'N5', common: true },
+        'itadakimasu': { kanji: 'いただきます', kana: 'いただきます', meaning: 'let us eat (grace)', jlpt: 'N5', common: true },
+        'gochisousama': { kanji: 'ごちそうさま', kana: 'ごちそうさま', meaning: 'thank you for the meal', jlpt: 'N5', common: true },
+        'ittekimasu': { kanji: '行ってきます', kana: 'いってきます', meaning: 'I am leaving (see you later)', jlpt: 'N5', common: true },
+        'itterasshai': { kanji: '行ってらっしゃい', kana: 'いってらっしゃい', meaning: 'have a good day', jlpt: 'N5', common: true },
+        'tadaima': { kanji: 'ただいま', kana: 'ただいま', meaning: 'I am home', jlpt: 'N5', common: true },
+        'okaeri': { kanji: 'お帰り', kana: 'おかえり', meaning: 'welcome back', jlpt: 'N5', common: true },
+        'genki': { kanji: '元気', kana: 'げんき', meaning: 'healthy, energetic', jlpt: 'N5', common: true },
+        'daijoubu': { kanji: '大丈夫', kana: 'だいじょうぶ', meaning: 'okay, alright', jlpt: 'N5', common: true },
+        'yokatta': { kanji: 'よかった', kana: 'よかった', meaning: 'that was good, relief', jlpt: 'N5', common: true },
+        'zannen': { kanji: '残念', kana: 'ざんねん', meaning: 'regrettable, unfortunate', jlpt: 'N4', common: true },
+        'shiawase': { kanji: '幸せ', kana: 'しあわせ', meaning: 'happiness', jlpt: 'N4', common: true },
+        'kanashii': { kanji: '悲しい', kana: 'かなしい', meaning: 'sad', jlpt: 'N4', common: true },
+        'ureshii': { kanji: '嬉しい', kana: 'うれしい', meaning: 'happy, glad', jlpt: 'N4', common: true },
+        'kowai': { kanji: '怖い', kana: 'こわい', meaning: 'scary', jlpt: 'N4', common: true },
+        'sugoi': { kanji: '凄い', kana: 'すごい', meaning: 'amazing, terrible', jlpt: 'N4', common: true },
+        'kakkouii': { kanji: '格好いい', kana: 'かっこいい', meaning: 'cool, handsome', jlpt: 'N4', common: true },
+        'kawaii': { kanji: '可愛い', kana: 'かわいい', meaning: 'cute', jlpt: 'N4', common: true },
+        'subarashii': { kanji: '素晴らしい', kana: 'すばらしい', meaning: 'wonderful', jlpt: 'N4', common: true },
+        'suki': { kanji: '好き', kana: 'すき', meaning: 'to like', jlpt: 'N4', common: true },
+        'kirai': { kanji: '嫌い', kana: 'きらい', meaning: 'to hate, dislike', jlpt: 'N4', common: true },
+        'hoshii': { kanji: '欲しい', kana: 'ほしい', meaning: 'to want', jlpt: 'N4', common: true },
+        'wakaru': { kanji: '分かる', kana: 'わかる', meaning: 'to understand', jlpt: 'N4', common: true },
+        'shiru': { kanji: '知る', kana: 'しる', meaning: 'to know', jlpt: 'N4', common: true },
+        'omou': { kanji: '思う', kana: 'おもう', meaning: 'to think', jlpt: 'N4', common: true },
+        'kangaeru': { kanji: '考える', kana: 'かんがえる', meaning: 'to consider, think about', jlpt: 'N4', common: true },
+        'motsu': { kanji: '持つ', kana: 'もつ', meaning: 'to hold, to possess', jlpt: 'N4', common: true },
+        'erabu': { kanji: '選ぶ', kana: 'えらぶ', meaning: 'to choose, select', jlpt: 'N4', common: true },
+        'tsukuru': { kanji: '作る', kana: 'つくる', meaning: 'to make, create', jlpt: 'N4', common: true },
+        'au': { kanji: '会う', kana: 'あう', meaning: 'to meet', jlpt: 'N4', common: true },
+        'matu': { kanji: '待つ', kana: 'まつ', meaning: 'to wait', jlpt: 'N4', common: true },
+        'tasukeru': { kanji: '助ける', kana: 'たすける', meaning: 'to help, save', jlpt: 'N4', common: true },
+        'tetsudau': { kanji: '手伝う', kana: 'てつだう', meaning: 'to help, assist', jlpt: 'N4', common: true },
+        'narau': { kanji: '習う', kana: 'ならう', meaning: 'to learn', jlpt: 'N4', common: true },
+        'oshieru': { kanji: '教える', kana: 'おしえる', meaning: 'to teach', jlpt: 'N4', common: true },
+        'wasureru': { kanji: '忘れる', kana: 'わすれる', meaning: 'to forget', jlpt: 'N4', common: true },
+        'oboeru': { kanji: '覚える', kana: 'おぼえる', meaning: 'to memorize', jlpt: 'N4', common: true },
+        'ageru': { kanji: '上げる', kana: 'あげる', meaning: 'to give, to raise', jlpt: 'N4', common: true },
+        'morau': { kanji: '貰う', kana: 'もらう', meaning: 'to receive', jlpt: 'N4', common: true },
+        'kariru': { kanji: '借りる', kana: 'かりる', meaning: 'to borrow', jlpt: 'N4', common: true },
+        'kasu': { kanji: '貸す', kana: 'かす', meaning: 'to lend', jlpt: 'N4', common: true },
+        'kaeru': { kanji: '変える', kana: 'かえる', meaning: 'to change', jlpt: 'N4', common: true },
+        'narau': { kanji: 'なる', kana: 'なる', meaning: 'to become', jlpt: 'N4', common: true },
+        'tsukau': { kanji: '使う', kana: 'つかう', meaning: 'to use', jlpt: 'N4', common: true },
+        'ireru': { kanji: '入れる', kana: 'いれる', meaning: 'to put in, insert', jlpt: 'N4', common: true },
+        'dasu': { kanji: '出す', kana: 'だす', meaning: 'to take out, put out', jlpt: 'N4', common: true },
+        'toru': { kanji: '取る', kana: 'とる', meaning: 'to take', jlpt: 'N4', common: true },
+        'hairu': { kanji: '入る', kana: 'はいる', meaning: 'to enter', jlpt: 'N4', common: true },
+        'deru': { kanji: '出る', kana: 'でる', meaning: 'to exit, go out', jlpt: 'N4', common: true },
+        'kaeru': { kanji: '返る', kana: 'かえる', meaning: 'to return', jlpt: 'N4', common: true },
+        'kaesu': { kanji: '返す', kana: 'かえす', meaning: 'to return something', jlpt: 'N4', common: true },
+        ' hajimeru': { kanji: '始める', kana: 'はじめる', meaning: 'to start, begin', jlpt: 'N4', common: true },
+        'owaru': { kanji: '終わる', kana: 'おわる', meaning: 'to end, finish', jlpt: 'N4', common: true },
+        'tsuzuku': { kanji: '続く', kana: 'つづく', meaning: 'to continue', jlpt: 'N4', common: true },
+        'yameru': { kanji: '止める', kana: 'やめる', meaning: 'to stop, quit', jlpt: 'N4', common: true },
+        'mieru': { kanji: '見える', kana: 'みえる', meaning: 'to be visible', jlpt: 'N4', common: true },
+        'kikoeru': { kanji: '聞こえる', kana: 'きこえる', meaning: 'to be audible', jlpt: 'N4', common: true },
+        'dekiru': { kanji: 'できる', kana: 'できる', meaning: 'to be able to, can', jlpt: 'N4', common: true },
+    },
+
     async search(query) {
+        const normalizedQuery = query.toLowerCase().trim();
+        
+        // Check local dictionary first for instant results
+        const localWord = this.COMMON_WORDS[normalizedQuery];
+        if (localWord) {
+            return this.buildFromLocal(localWord, query);
+        }
+
         const jishoUrl = this.JISHO + encodeURIComponent(query);
         for (const proxy of this.PROXIES) {
             try {
@@ -349,6 +532,39 @@ const JishoAPI = {
         }
         // All proxies failed — fall back to Jotoba (direct API, no proxy needed)
         return await this.tryJotoba(query);
+    },
+
+    buildFromLocal(local, query) {
+        const displayWord = local.kanji || local.kana || query;
+        const diff = local.jlpt || 'N5';
+        return {
+            word: displayWord,
+            nativeScript: displayWord,
+            romaji: query,
+            kana: local.kana,
+            pronunciation: local.kana || displayWord,
+            partOfSpeech: 'word',
+            meaning: local.meaning,
+            allMeanings: [local.meaning],
+            example: `${displayWord} (${local.kana}) — ${local.meaning}`,
+            synonyms: [], antonyms: [], relatedWords: [],
+            popularity: local.common ? '★★★★★' : '★★★★☆',
+            language: 'ja',
+            contextExamples: { 
+                formal: local.meaning, 
+                casual: `${local.kana} — ${local.meaning}`, 
+                academic: local.meaning 
+            },
+            wordRelationships: { synonyms: [], antonyms: [], wordFamily: [] },
+            wordInsights: {
+                difficulty: `JLPT ${diff}`,
+                frequency: local.common ? 'Very Common' : 'Common',
+                etymology: 'Japanese',
+                partOfSpeech: 'Japanese word'
+            },
+            isJapanese: true,
+            jlptLevel: diff
+        };
     },
 
     async tryJotoba(query) {
@@ -366,7 +582,8 @@ const JishoAPI = {
             const kana  = w.reading?.kana  || '';
             const sense = w.senses?.[0] || {};
             const glosses = sense.glosses || ['No definition'];
-            return this._build(kanji, kana, query, glosses, [glosses.join(', ')], false, '');
+            const partsOfSpeech = sense.parts_of_speech || [];
+            return this._build(kanji, kana, query, glosses, [glosses.join(', ')], false, '', partsOfSpeech);
         } catch { return null; }
     },
 
@@ -377,41 +594,104 @@ const JishoAPI = {
         const senses  = entry.senses || [];
         const sense   = senses[0]  || {};
         const glosses = sense.english_definitions || ['No definition'];
+        const partsOfSpeech = sense.parts_of_speech || [];
+        
+        // Extract all meanings with POS
         const allMeanings = senses.slice(0, 4).map(s => {
             const pos = (s.parts_of_speech || [])[0] || '';
-            return pos ? `(${pos}) ${s.english_definitions.join(', ')}` : s.english_definitions.join(', ');
+            const def = s.english_definitions.join(', ');
+            return pos ? `(${pos}) ${def}` : def;
         });
-        const jlpt    = entry.jlpt?.[0] || '';
+
+        // Extract JLPT levels (can be multiple)
+        const jlptLevels = entry.jlpt || [];
+        const jlptDisplay = jlptLevels.length > 0 
+            ? jlptLevels.map(j => j.replace('jlpt-', '').toUpperCase()).join(', ')
+            : '';
+
+        // Extract example sentences if available
+        const exampleSentences = [];
+        if (entry.japanese?.[0]?.sentences) {
+            entry.japanese[0].sentences.slice(0, 3).forEach(s => {
+                if (s.japanese && s.english) {
+                    exampleSentences.push({
+                        japanese: s.japanese,
+                        english: s.english
+                    });
+                }
+            });
+        }
+
+        // Extract word forms/inflections
+        const wordForms = [];
+        if (entry.japanese) {
+            entry.japanese.forEach(j => {
+                if (j.word && j.reading && (j.word !== kanji || j.reading !== kana)) {
+                    wordForms.push({ kanji: j.word, kana: j.reading });
+                }
+            });
+        }
+
         const common  = !!entry.is_common;
-        return this._build(kanji, kana, query, glosses, allMeanings, common, jlpt);
+        return this._build(kanji, kana, query, glosses, allMeanings, common, jlptDisplay, partsOfSpeech, exampleSentences, wordForms);
     },
 
-    _build(kanji, kana, query, glosses, allMeanings, isCommon, jlpt) {
+    _build(kanji, kana, query, glosses, allMeanings, isCommon, jlpt, partsOfSpeech = [], exampleSentences = [], wordForms = []) {
         const displayWord = kanji || kana || query;
-        const diff = jlpt ? `JLPT ${jlpt.replace('jlpt-', '').toUpperCase()}` :
-                     (!kanji ? 'Beginner' : (kanji.length <= 2 ? 'Intermediate' : 'Advanced'));
+        const pos = partsOfSpeech[0] || 'word';
+        
+        // Calculate difficulty based on JLPT or kanji complexity
+        let diff;
+        if (jlpt) {
+            diff = `JLPT ${jlpt}`;
+        } else if (!kanji) {
+            diff = 'Beginner (N5)';
+        } else if (kanji.length <= 2) {
+            diff = 'Intermediate (N4)';
+        } else if (kanji.length <= 4) {
+            diff = 'Advanced (N3)';
+        } else {
+            diff = 'Expert (N2-N1)';
+        }
+
+        // Build example from API examples or fallback
+        let example;
+        if (exampleSentences.length > 0) {
+            const ex = exampleSentences[0];
+            example = `${ex.japanese} — ${ex.english}`;
+        } else {
+            example = kana ? `${displayWord} (${kana}) — ${glosses[0]}` : `${displayWord} — ${glosses[0]}`;
+        }
+
         return {
             word: displayWord,
             nativeScript: displayWord,
             romaji: query,
             kana,
-            pronunciation: kana || displayWord,  // speak kana for TTS
-            partOfSpeech: 'noun',
+            pronunciation: kana || displayWord,
+            partOfSpeech: pos,
             meaning: glosses.join('; '),
             allMeanings,
-            example: kana ? `${displayWord} (${kana}) — ${glosses[0]}` : `${displayWord} — ${glosses[0]}`,
+            example,
+            exampleSentences,
+            wordForms,
             synonyms: [], antonyms: [], relatedWords: [],
-            popularity: isCommon ? '★★★★☆' : '★★★☆☆',
+            popularity: isCommon ? '★★★★★' : '★★★★☆',
             language: 'ja',
-            contextExamples: { formal: glosses[0] || '', casual: kana || query, academic: glosses.join('; ') },
-            wordRelationships: { synonyms: [], antonyms: [], wordFamily: [] },
+            contextExamples: { 
+                formal: glosses[0] || '', 
+                casual: kana || query, 
+                academic: glosses.join('; ') 
+            },
+            wordRelationships: { synonyms: [], antonyms: [], wordFamily: wordForms.map(f => f.kanji || f.kana) },
             wordInsights: {
                 difficulty: diff,
-                frequency: isCommon ? 'Common word' : 'Less common',
+                frequency: isCommon ? 'Very Common' : 'Common',
                 etymology: 'Japanese',
-                partOfSpeech: 'Japanese word'
+                partOfSpeech: pos
             },
-            isJapanese: true
+            isJapanese: true,
+            jlptLevel: jlpt
         };
     }
 };
@@ -687,11 +967,23 @@ const API = {
         const phonetic = entry.phonetic || entry.phonetics?.find(p => p.text)?.text || '';
         const meanings = entry.meanings[0];
         const defs     = meanings.definitions || [];
+        
+        // Extract multiple definitions/meanings
+        const allDefinitions = defs.slice(0, 5).map(d => ({
+            definition: d.definition,
+            example: d.example,
+            synonyms: d.synonyms || []
+        }));
+
+        // Extract etymology if available
+        const etymology = entry.etymologies?.[0] || this.generateEtymology(word);
+
         return {
             word,
             pronunciation: phonetic,
             partOfSpeech:  meanings.partOfSpeech,
             meaning:       defs[0]?.definition || 'No definition available',
+            allDefinitions,
             example:       defs[0]?.example    || '',
             synonyms:      meanings.synonyms?.slice(0, 8)  || [],
             antonyms:      meanings.antonyms?.slice(0, 6)  || [],
@@ -705,15 +997,27 @@ const API = {
             wordRelationships: {
                 synonyms:   meanings.synonyms?.slice(0, 5) || [],
                 antonyms:   meanings.antonyms?.slice(0, 4) || [],
-                wordFamily: []
+                wordFamily: this.extractWordFamily(entry)
             },
             wordInsights: {
                 difficulty: this.calculateDifficulty(word),
                 frequency:  'Loading…',
-                etymology:  this.generateEtymology(word),
-                partOfSpeech: meanings.partOfSpeech
+                etymology:  etymology,
+                partOfSpeech: meanings.partOfSpeech,
+                alternateMeanings: allDefinitions.slice(1).map(d => d.definition)
             }
         };
+    },
+
+    extractWordFamily(entry) {
+        const family = [];
+        // Extract related words from the API if available
+        if (entry.meanings) {
+            entry.meanings.forEach(m => {
+                if (m.synonyms) family.push(...m.synonyms.slice(0, 3));
+            });
+        }
+        return [...new Set(family)].slice(0, 8);
     },
 
     calculatePopularity(word) {
@@ -736,14 +1040,20 @@ const API = {
     // BUG FIX: improved etymology heuristics
     generateEtymology(word) {
         const w = word.toLowerCase();
-        if (w.endsWith('tion') || w.endsWith('sion') || w.endsWith('ment') || w.endsWith('ance'))
+        if (w.endsWith('tion') || w.endsWith('sion') || w.endsWith('ment') || w.endsWith('ance') || w.endsWith('ence'))
             return 'Latin / Old French origin';
-        if (w.startsWith('ph') || w.endsWith('logy') || w.endsWith('graphy') || w.endsWith('ism'))
+        if (w.startsWith('ph') || w.endsWith('logy') || w.endsWith('graphy') || w.endsWith('ism') || w.endsWith('phy'))
             return 'Greek origin';
-        if (w.endsWith('que') || w.endsWith('eur') || w.endsWith('ois'))
+        if (w.endsWith('que') || w.endsWith('eur') || w.endsWith('ois') || w.endsWith('ette'))
             return 'French origin';
-        if (w.endsWith('schaft') || w.endsWith('heit') || w.endsWith('ung'))
+        if (w.endsWith('schaft') || w.endsWith('heit') || w.endsWith('ung') || w.endsWith('keit'))
             return 'Germanic origin';
+        if (w.endsWith('ka') || w.endsWith('ski') || w.endsWith('ov'))
+            return 'Slavic origin';
+        if (w.endsWith('ito') || w.endsWith('ita') || w.endsWith('ello'))
+            return 'Italian/Spanish origin';
+        if (w.endsWith('san') || w.endsWith('maru') || w.endsWith('ko'))
+            return 'Japanese origin';
         return 'Old English / Proto-Germanic origin';
     },
 
@@ -1221,11 +1531,21 @@ const Search = {
 // Vocabulary Module
 // =====================
 const Vocabulary = {
+    STARTER_WORDS: {
+        en: ['serendipity', 'ephemeral', 'eloquent', 'resilient', 'ubiquitous'],
+        hi: ['pyaar', 'dil', 'zindagi', 'khushi', 'sach'],
+        fr: ['bonjour', 'amour', 'liberté', 'éphémère', 'résilient'],
+        es: ['hola', 'amor', 'libertad', 'efímero', 'resiliente'],
+        de: ['hallo', 'liebe', 'freiheit', 'vergänglich', 'widerstandsfähig'],
+        ja: ['neko', 'sakura', 'arigatou', 'konnichiwa', 'genki']
+    },
+
     init() {
         this.vocabSearch = document.getElementById('vocabSearch');
         this.sortSelect = document.getElementById('sortSelect');
         this.vocabularyList = document.getElementById('vocabularyList');
         this.emptyVocabulary = document.getElementById('emptyVocabulary');
+        this.starterWordsEl = document.getElementById('starterWords');
 
         this.vocabSearch.addEventListener('input', () => this.render());
         this.sortSelect.addEventListener('change', () => this.render());
@@ -1264,10 +1584,30 @@ const Vocabulary = {
         if (vocabulary.length === 0) {
             this.vocabularyList.innerHTML = '';
             this.emptyVocabulary.classList.remove('hidden');
+            this.renderStarterWords();
         } else {
             this.emptyVocabulary.classList.add('hidden');
             this.vocabularyList.innerHTML = vocabulary.map(word => this.createWordCard(word)).join('');
         }
+    },
+
+    renderStarterWords() {
+        const lang = Storage.getCurrentLanguage();
+        const words = this.STARTER_WORDS[lang] || this.STARTER_WORDS.en;
+        this.starterWordsEl.innerHTML = words.map(word => 
+            `<span class="starter-chip" data-word="${word}">${word}</span>`
+        ).join('');
+
+        // Add click handlers
+        this.starterWordsEl.querySelectorAll('.starter-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const word = chip.dataset.word;
+                // Switch to search section and search the word
+                Navigation.navigateTo('search');
+                Search.searchInput.value = word;
+                Search.handleSearch();
+            });
+        });
     },
 
     createWordCard(word) {

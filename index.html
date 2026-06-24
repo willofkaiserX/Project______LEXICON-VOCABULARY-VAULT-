@@ -11,7 +11,19 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-brand">
-                <span class="brand-icon">📚</span>
+                <div class="brand-logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4" y="4" width="24" height="24" rx="6" fill="url(#brand-gradient)"/>
+                        <path d="M10 16L14 20L22 12" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="brand-gradient" x1="4" y1="4" x2="28" y2="28" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#6366f1"/>
+                                <stop offset="0.5" stop-color="#8b5cf6"/>
+                                <stop offset="1" stop-color="#06b6d4"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
                 <span class="brand-text">Lexicon Vault</span>
                 <div class="xp-display">
                     <span class="xp-level" id="xpLevel">Level 1</span>
@@ -129,7 +141,12 @@
                 <div id="vocabularyList" class="vocabulary-list"></div>
                 <div id="emptyVocabulary" class="empty-state">
                     <div class="empty-icon">📝</div>
-                    <p>No words saved yet. Start searching and adding words!</p>
+                    <h3>No words saved yet</h3>
+                    <p>Start searching and adding words to build your vocabulary!</p>
+                    <div class="starter-words">
+                        <p class="starter-label">Try these starter words:</p>
+                        <div class="starter-chips" id="starterWords"></div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -169,7 +186,15 @@
                 </div>
                 <div id="emptyFlashcards" class="empty-state">
                     <div class="empty-icon">🎴</div>
-                    <p>Add words to use flashcards</p>
+                    <h3>No flashcards yet</h3>
+                    <p>Add words to your vocabulary to start practicing with flashcards!</p>
+                    <div class="sample-card-preview">
+                        <div class="preview-card">
+                            <div class="preview-front">Sample Word</div>
+                            <div class="preview-back">Sample Definition</div>
+                        </div>
+                        <p class="preview-hint">Click cards to flip them</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -180,11 +205,20 @@
                 <h2 class="section-title">Quiz Mode</h2>
                 <div id="quizLocked" class="quiz-locked">
                     <div class="lock-icon">🔒</div>
+                    <h3>Quiz Locked</h3>
                     <p>Add at least 20 words to unlock quizzes</p>
                     <div class="progress-bar">
                         <div class="progress-fill" id="quizProgressFill"></div>
                     </div>
                     <p class="progress-text"><span id="quizProgress">0</span> / 20 words</p>
+                    <div class="demo-quiz-hint">
+                        <p>🎯 Quiz types available:</p>
+                        <ul>
+                            <li>Multiple Choice</li>
+                            <li>Reverse Quiz</li>
+                            <li>Learned Words Challenge</li>
+                        </ul>
+                    </div>
                 </div>
                 <div id="quizContainer" class="quiz-container hidden">
                     <div class="quiz-menu">
